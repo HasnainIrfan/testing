@@ -1,0 +1,81 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+.yarn/*
+
+# Build outputs
+dist
+build
+.next
+out
+.turbo
+
+# Testing
+coverage
+**/coverage
+
+# Environment
+**/.env
+**/.env.*
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Cache and artifacts
+.cache
+.eslintcache
+*.tsbuildinfo
+next-env.d.ts
+
+# PWA files
+**/public/sw.js
+**/public/workbox-*.js
+**/public/worker-*.js
+**/public/fallback-*.js
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated files
+auto-imports.d.ts
+.eslintrc-auto-import.json
+
+# Mobile/iOS specific
+ios/Pods/
+ios/build/
+android/app/build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Firebase
+**/GoogleService-Info.plist
+**/GoogleService-Info-*.plist
+*firebase-adminsdk.json
+
+# Misc
+*.log
+*.pem
+.vercel 

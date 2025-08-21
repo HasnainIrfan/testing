@@ -1,0 +1,187 @@
+# Dependencies
+**/node_modules/
+**/.pnp
+**/.pnp.*
+**/.yarn/*
+!**/.yarn/patches
+!**/.yarn/plugins
+!**/.yarn/releases
+!**/.yarn/versions
+
+# Environment Variables
+# All .env files except examples
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.template
+!**/.env.test.example
+
+# Next.js specific
+**/.next/
+**/out/
+**/.turbo
+**/.contentlayer
+
+# Build outputs
+**/dist/
+**/dist-ssr/
+**/build/
+**/DerivedData/
+**/.build/
+
+# Debug & Logs
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/.pnpm-debug.log*
+**/pnpm-debug.log*
+**/*.log
+**/*.hmap
+**/*.ipa
+**/*.dSYM.zip
+**/*.dSYM
+**/logs/
+**/report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Testing
+**/coverage/
+**/*.lcov
+**/.nyc_output
+**/fastlane/test_output
+**/*.coverage
+**/coverage.xml
+**/coverage.json
+**/junit.xml
+**/test-results/
+
+# Package Manager Locks
+# Keep these at root level since they're typically project-wide
+/package-lock.json
+/pnpm-lock.yaml
+/bun.lockb
+/yarn.lock
+/Package.resolved
+
+# TypeScript
+**/*.tsbuildinfo
+**/next-env.d.ts
+
+# IDE and Editor files
+**/.vscode
+!**/.vscode/settings.json
+!**/.vscode/tasks.json
+!**/.vscode/launch.json
+!**/.vscode/extensions.json
+**/.idea
+**/*.suo
+**/*.ntvs*
+**/*.njsproj
+**/*.sln
+**/*.sw?
+**/xcuserdata
+**/*.xcscmblueprint
+**/*.xccheckout
+**/.swiftpm/xcode/package.xcworkspace/
+**/.ipynb_checkpoints/
+**/.project
+**/.classpath
+**/.c9/
+**/*.launch
+**/.settings/
+**/*.sublime-workspace
+
+# Xcode
+**/*.pbxuser
+!default.pbxuser
+**/*.mode1v3
+!default.mode1v3
+**/*.mode2v3
+!default.mode2v3
+**/*.perspectivev3
+!default.perspectivev3
+**/*.xcworkspace
+!default.xcworkspace
+
+# Carthage
+Carthage/Build
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Code Signing
+*.certSigningRequest
+*.p12
+
+# Sensitive and dev Information
+ios/indepth/indepth/GoogleService-Info.plist
+ios/indepth/indepth/Configuration/*/GoogleService-Info*.plist
+ios/indepth/indepth/devconfig.plist
+ios/indepth/indepth/Configuration/devconfig.plist
+
+# iOS Configuration Files (contain secrets)
+ios/indepth/indepth/Configuration/*.xcconfig
+!ios/indepth/indepth/Configuration/*.xcconfig.sample
+
+# Firebase specific
+.firebaserc
+service-accounts/
+*.serviceAccountKey.json
+*-service-account.json
+*firebase-adminsdk.json
+service-account-key.json
+
+# Python specific
+**/__pycache__/
+**/venv/
+
+# Runtime data
+**/pids
+**/*.pid
+**/*.seed
+**/*.pid.lock
+
+# Temporary files
+**/.temp
+**/.tmp
+**/*.local
+**/.cache
+
+# Miscellaneous
+.DS_Store
+**/*.swp
+**/*.swo
+*:Zone.Identifier
+
+# Auto-generated files
+**/auto-imports.d.ts
+**/.eslintrc-auto-import.json
+
+# MCP configurations
+.roo/mcp.json
+
+# Vercel
+**/.vercel
+
+# Expo & React Native
+**/.expo/
+**/expo-env.d.ts
+**/web-build/
+**/.kotlin/
+**/*.orig.*
+**/*.jks
+**/*.p8
+**/*.key
+**/*.mobileprovision
+**/.metro-health-check*
+**/*.pem
+
+# Shopify specific
+apps/shopify/**/.shopify/*
+apps/shopify/**/.shopify.lock
+apps/shopify/**/database.sqlite
+apps/shopify/**/dev.sqlite
+apps/shopify/**/*.sqlite-journal
+apps/shopify/**/public/_dev
