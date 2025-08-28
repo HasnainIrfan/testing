@@ -3,13 +3,17 @@ import { createSlice } from '@reduxjs/toolkit'
 export const globalSlice = createSlice({
   name: 'global',
   initialState: {
-    user: false,
+    sidebarOpen: false,
+    sidebarCollapsed: false,
   },
   reducers: {
-    setUser: (state, action) => {
-      state.user = action.payload
+    setSidebarCollapsed: (state, action) => {
+      state.sidebarCollapsed = action.payload
+    },
+    setSidebarOpen: (state, action) => {
+      state.sidebarOpen = action.payload
     },
   },
 })
 
-export const { setUser } = globalSlice.actions
+export const { setSidebarCollapsed, setSidebarOpen } = globalSlice.actions

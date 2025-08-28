@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: nodejs-server
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_PATH=/app/data/database.sqlite
+      - DEFAULT_USER=admin
+      - DEFAULT_PASSWORD=admin123
+      - JWT_SECRET=your-secret-key-change-in-production
+      - JWT_ACCESS_EXPIRY=5m
+      - JWT_REFRESH_EXPIRY=7d
+      - JWT_REFRESH_SECRET=your-refresh-secret-change-in-production
+      - RATE_LIMIT_WINDOW_MS=900000
+      - RATE_LIMIT_LOGIN_MAX=50
+      - RATE_LIMIT_API_MAX=1000
+    volumes:
+      # Persistent volume for SQLite database
+      - sqlite_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Use bridge network to connect to external databases
+    network_mode: bridge
+
+volumes:
+  sqlite_data:
+    driver: local
+    name: nodejs-server-sqlite

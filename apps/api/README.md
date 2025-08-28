@@ -1,103 +1,369 @@
-# analytics-dashboard-backend
+# Node.js Database Connection Manager
 
-## Getting started
+A Node.js server with SQLite for managing connections to external databases (PostgreSQL, MySQL, SQL Server).
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Quick Start (Dead Simple!)
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+### 1. Start the Node.js Server
 
-## Add your files
+```bash
+# Start the server (automatic migrations, persistent SQLite storage)
+docker-compose up -d
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.com/saharjaved95/analytics-dashboard-backend.git
-git branch -M main
-git push -uf origin main
+# Check if server is running
+curl http://localhost:3000/health
 ```
 
-## Integrate with your tools
+That's it! The server is now running on `http://localhost:3000` with:
 
-- [ ] [Set up project integrations](https://gitlab.com/saharjaved95/analytics-dashboard-backend/-/settings/integrations)
+- ✅ Automatic SQLite database creation
+- ✅ Automatic migrations (creates all required tables)
+- ✅ Persistent data storage
+- ✅ Default admin user created (admin/admin123)
 
-## Collaborate with your team
+**Database Tables Created Automatically:**
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+- `users` - User management and authentication
+- `connections` - Database connection configurations
+- `dashboards` - Dashboard configurations with widgets
 
-## Test and Deploy
+### 2. (Optional) Start Test Databases
 
-Use the built-in continuous integration in GitLab.
+If you want to test database connections:
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+```bash
+# Start PostgreSQL, MySQL, and SQL Server containers
+docker-compose -f docker-compose-databases.yml up -d
+```
 
----
+## Architecture
 
-# Editing this README
+```
+┌─────────────────────────┐
+│   Node.js Server        │
+│   (Container 1)         │
+│   - Express API         │
+│   - SQLite (internal)   │
+│   - Port: 3000          │
+└───────────┬─────────────┘
+            │
+    Can connect to external
+    databases via host network
+            │
+    ┌───────┴────────┬──────────┬──────────┐
+    │                │          │          │
+┌───▼────┐    ┌─────▼───┐  ┌───▼────┐  ┌──▼──────┐
+│Postgres│    │  MySQL  │  │ MSSQL  │  │ Others  │
+│ :5432  │    │  :3306  │  │ :1433  │  │   ...   │
+└────────┘    └─────────┘  └────────┘  └─────────┘
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## Features
 
-## Suggestions for a good README
+- **Isolated Node.js Container**: Runs independently with its own SQLite database
+- **Persistent Storage**: SQLite data persists across container restarts
+- **External Database Connectivity**: Can connect to databases outside its container
+- **Automatic Setup**: Migrations run automatically on startup
+- **Health Checks**: Built-in health monitoring
+- **JWT Authentication**: Secure API access
+- **Dashboard Management**: Create and manage custom dashboards with widgets
+- **Query Execution**: Execute SQL queries on connected databases
+- **Multi-Database Support**: PostgreSQL, MySQL, and SQL Server
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## API Endpoints
 
-## Name
+### Authentication
 
-Choose a self-explaining name for your project.
+```bash
+# Login (returns JWT token)
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+```
 
-## Description
+### Managing Connections
 
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+```bash
+# Get token first
+TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}' | jq -r '.accessToken')
 
-## Badges
+# Create a connection
+curl -X POST http://localhost:3000/api/connections \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My PostgreSQL",
+    "type": "postgres",
+    "host": "host.docker.internal",  # Use this for localhost databases
+    "port": 5432,
+    "database": "mydb",
+    "username": "user",
+    "password": "pass"
+  }'
 
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+# List all connections
+curl -X GET http://localhost:3000/api/connections \
+  -H "Authorization: Bearer $TOKEN"
 
-## Visuals
+# Test a connection
+curl -X POST http://localhost:3000/api/connections/{id}/test \
+  -H "Authorization: Bearer $TOKEN"
 
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+# Execute a query
+curl -X POST http://localhost:3000/api/connections/query \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "connectionId": 1,
+    "query": "SELECT * FROM users LIMIT 10"
+  }'
+```
 
-## Installation
+### Managing Dashboards
 
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+```bash
+# Create a dashboard
+curl -X POST http://localhost:3000/api/dashboards \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Sales Dashboard",
+    "description": "Monthly sales metrics",
+    "connection_id": 1,
+    "is_public": true,
+    "configuration": {
+      "theme": "dark",
+      "widgets": [
+        {
+          "id": "w1",
+          "type": "chart",
+          "title": "Revenue Trend",
+          "query": "SELECT date, revenue FROM sales"
+        }
+      ]
+    }
+  }'
 
-## Usage
+# List all dashboards
+curl -X GET http://localhost:3000/api/dashboards \
+  -H "Authorization: Bearer $TOKEN"
 
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+# Get dashboard statistics
+curl -X GET http://localhost:3000/api/dashboards/statistics \
+  -H "Authorization: Bearer $TOKEN"
+```
 
-## Support
+## Database Connection Examples
 
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Connect to Databases on Host Machine
 
-## Roadmap
+Use `host.docker.internal` as the hostname:
 
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+```json
+{
+  "host": "host.docker.internal",
+  "port": 5432
+}
+```
 
-## Contributing
+### Connect to Databases in Other Containers
 
-State if you are open to contributions and what your requirements are for accepting them.
+Use the container name or IP:
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+```json
+{
+  "host": "test-postgres", // Container name
+  "port": 5432
+}
+```
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+### Connect to Remote Databases
 
-## Authors and acknowledgment
+Use the actual hostname/IP:
 
-Show your appreciation to those who have contributed to the project.
+```json
+{
+  "host": "db.example.com",
+  "port": 5432
+}
+```
+
+## Default Credentials
+
+### Test Databases (from docker-compose-databases.yml)
+
+| Database   | Username | Password    | Database | Port |
+| ---------- | -------- | ----------- | -------- | ---- |
+| PostgreSQL | testuser | testpass123 | testdb   | 5432 |
+| MySQL      | testuser | testpass123 | testdb   | 3306 |
+| SQL Server | sa       | MyPass123   | master   | 1433 |
+
+### API Admin User
+
+- Username: `admin`
+- Password: `admin123`
+
+## Management Commands
+
+```bash
+# View logs
+docker-compose logs -f
+
+# Stop the server
+docker-compose down
+
+# Stop and remove data
+docker-compose down -v
+
+# Rebuild after code changes
+docker-compose build --no-cache
+docker-compose up -d
+
+# Check container status
+docker ps
+
+# Execute commands in container
+docker exec -it nodejs-server sh
+```
+
+## Environment Variables
+
+You can customize these in `docker-compose.yml`:
+
+- `PORT`: Server port (default: 3000)
+- `DB_PATH`: SQLite database path
+- `JWT_SECRET`: JWT signing secret
+- `DEFAULT_USER`: Default admin username
+- `DEFAULT_PASSWORD`: Default admin password
+
+## Troubleshooting
+
+### Server not starting?
+
+```bash
+docker-compose logs app
+```
+
+### Can't connect to external database?
+
+1. Check if database is running: `telnet <host> <port>`
+2. Verify credentials
+3. For localhost databases, use `host.docker.internal`
+
+### Data not persisting?
+
+Check volume is created:
+
+```bash
+docker volume ls | grep nodejs-server-sqlite
+```
+
+## Database Schema
+
+### Tables Created on Startup
+
+1. **users**
+
+   - `id` (INTEGER, Primary Key)
+   - `username` (VARCHAR, Unique)
+   - `email` (VARCHAR, Unique)
+   - `password` (VARCHAR, Hashed)
+   - `created_at` (TIMESTAMP)
+   - `updated_at` (TIMESTAMP)
+
+2. **connections**
+
+   - `id` (INTEGER, Primary Key)
+   - `name` (VARCHAR)
+   - `type` (VARCHAR: postgres/mysql/mssql)
+   - `host` (VARCHAR)
+   - `port` (INTEGER)
+   - `database` (VARCHAR)
+   - `username` (VARCHAR)
+   - `password` (VARCHAR, Encrypted)
+   - `max_connections` (INTEGER)
+   - `is_active` (BOOLEAN)
+   - `created_at` (TIMESTAMP)
+   - `updated_at` (TIMESTAMP)
+
+3. **dashboards**
+   - `id` (INTEGER, Primary Key)
+   - `name` (VARCHAR)
+   - `description` (TEXT)
+   - `configuration` (TEXT, JSON)
+   - `connection_id` (INTEGER, Foreign Key)
+   - `created_by` (INTEGER, Foreign Key)
+   - `is_public` (BOOLEAN)
+   - `is_active` (BOOLEAN)
+   - `created_at` (TIMESTAMP)
+   - `updated_at` (TIMESTAMP)
+
+## Development
+
+### Local Development (without Docker)
+
+```bash
+# Install dependencies
+npm install
+
+# Run migrations
+npm run migrate
+
+# Start server
+npm start
+```
+
+### Running Tests
+
+```bash
+# Start all services
+docker-compose up -d
+docker-compose -f docker-compose-databases.yml up -d
+
+# Test all APIs (from API_DOCUMENTATION.md)
+curl -s https://raw.githubusercontent.com/your-repo/main/test-suite.sh | bash
+
+# Or run individual test scripts
+./test-connections.sh
+./test-dashboards.sh
+```
+
+### API Documentation
+
+For complete API documentation with all endpoints and examples, see:
+
+- `API_DOCUMENTATION.md` - Comprehensive API reference
+- Includes test scripts for all endpoints
+- Examples for CRUD operations on all databases
+
+## Migrations
+
+Migrations run automatically when the container starts. The following migrations are executed in order:
+
+1. `20250118_create_users_table.js` - Creates users table with authentication fields
+2. `20250119_create_connections_table.js` - Creates connections table for database configs
+3. `20250120_create_dashboards_table.js` - Creates dashboards table for dashboard management
+
+To add new migrations:
+
+1. Create a new file in `src/migrations/` with format `YYYYMMDD_description.js`
+2. Export `up` and `down` functions
+3. Rebuild the container: `docker-compose build --no-cache && docker-compose up -d`
+
+## Security Notes
+
+⚠️ **For production use:**
+
+- Change JWT_SECRET and JWT_REFRESH_SECRET
+- Use strong passwords
+- Enable SSL for database connections
+- Use environment-specific .env files
+- Never commit secrets to repository
+- Passwords in connections table are encrypted
+- Dashboard access control based on user ownership
 
 ## License
 
-For open source projects, say how it is licensed.
-
-## Project status
-
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+MIT

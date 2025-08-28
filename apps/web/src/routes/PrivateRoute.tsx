@@ -1,24 +1,26 @@
-import React from 'react'
-
-// react-router-dom
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
-// Components
-import DashbboardLayout from '../components/organisms/DashboardLayout'
-// Data
-import { LINKS } from '../data/links'
-import { TABAYAD_SESSION } from '../utils/constant'
-// Utils
-import { getCookie } from '../utils/cookie'
+import DashboardLayout from '@/components/organisms/DashboardLayout'
+import { LINKS } from '@/data/links'
+import { SESSION } from '@/utils/constant'
+import { getCookie } from '@/utils/cookie'
 
 const PrivateRoute = () => {
   const location = useLocation()
-  const auth = getCookie(TABAYAD_SESSION)
+  const auth = getCookie(SESSION)
+
+  return (
+    <DashboardLayout>
+      <Outlet />
+    </DashboardLayout>
+  )
+
+  // TODO: Add authentication when login is implemented
 
   return auth ? (
-    <DashbboardLayout>
+    <DashboardLayout>
       <Outlet />
-    </DashbboardLayout>
+    </DashboardLayout>
   ) : (
     <Navigate to={LINKS.LOGIN} state={{ from: location }} replace />
   )

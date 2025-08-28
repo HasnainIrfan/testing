@@ -1,5 +1,12 @@
+import { Provider } from './redux/provider'
+import Routing from './routes/Routing'
+
 function App() {
-  return <h1 className="h-9 w-9 bg-red-500 text-orange-400">dads</h1>
+  return (
+    <Provider>
+      <Routing />
+    </Provider>
+  )
 }
 
 export default App

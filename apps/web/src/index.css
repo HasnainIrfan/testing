@@ -2,6 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'Outfit-Regular';
+  src: url('./assets/fonts/Outfit-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Outfit-Medium';
+  src: url('./assets/fonts/Outfit-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Outfit-Bold';
+  src: url('./assets/fonts/Outfit-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Outfit-SemiBold';
+  src: url('./assets/fonts/Outfit-SemiBold.ttf') format('truetype');
+}
+
+:root {
+  --background: #ecedf3;
+  --white: #fff;
+  --primary: #374462;
+  --secondary: #629ac2;
+  --blueColor: #3578e5;
+  --lightBlue: #8c83fc;
+  --red: #ff0000;
+  --gray: #545454;
+  --gray-2: #656565;
+  --gray-3: #c5c5c5;
+  --gray-4: #0000000f;
+  --black: #1e1e1e;
+  --light-black: #606366;
+  --green: #0eec2f;
+  --orange: #ffa12b;
+  --yellow: #f4e409;
+  --light-gray: #f3f3f3;
+  --light-gray-2: #d9d9d9;
+  --dark-gray: #3e5259;
+  --light-pink: rgb(251, 236, 236);
+  --dark-pink: #bf1650;
+  --font-Bold: Outfit-Bold;
+  --font-Semibold: Outfit-SemiBold;
+  --font-Regular: Outfit-Regular;
+  --font-Medium: Outfit-Medium;
+}
+
+body {
+  font-family: var(--font-Regular);
+}
+
 /* Hide number input arrows */
 input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {

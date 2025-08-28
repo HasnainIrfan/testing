@@ -2,9 +2,6 @@ export const LINKS = {
   ROOT: '/',
 
   LOGIN: '/login',
-  FORGOTPASS: '/forgot-password',
-  VERIFYCODE: '/verify-code',
-  RESETPASSWORD: '/reset-password',
   DASHBOARD: '/dashboard',
 
   ERROR_404: '/error404',
